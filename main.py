@@ -2,16 +2,19 @@
 import pyaudio
 import time
 import numpy
+from collections import deque
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
+RETENSION_SECONDS = 100
 CHUNK = 2**11
 from matplotlib import pyplot as plt
 
 
 audio = pyaudio.PyAudio()
-frames = []
+deque_len = RATE * RETENSION_SECONDS
+frames = deque([0]*deque_len, maxlen=deque_len)
 def callback(in_data, frame_count, time_info, status):
     d = numpy.fromstring(in_data, dtype=numpy.int16)
     frames.extend(list(d))
@@ -30,6 +33,7 @@ while True:
 #    plt.plot(frames)
     plt.specgram(frames,Fs = 2)
     plt.pause(.1)
+    plt.gcf().clear()
 
 stream.stop_stream()
 stream.close()
